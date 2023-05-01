@@ -32,6 +32,8 @@ public class Board : MonoBehaviour
     private TileNode[,] _allTiles;
     private GamePieceNode[,] _allPieces;
 
+    public Action OnBoardMoveCompleted;
+
     private void Awake()
     {
         _allTiles = new TileNode[width, height];
@@ -40,11 +42,16 @@ public class Board : MonoBehaviour
 
     private void Start()
     {
+        SpawnInitialElements();
+    }
+
+    private void SpawnInitialElements()
+    {
         SpawnTileNodes();
         SpawnGamePieceNode(2, nodeDataContainer.GetNodeDataByValue(2));
     }
 
-    private void Update()
+    public void TryGetMoveInput()
     {
         if (Input.GetKeyDown(KeyCode.LeftArrow)) MoveTo(Vector2Int.left);
         if (Input.GetKeyDown(KeyCode.RightArrow)) MoveTo(Vector2Int.right);
@@ -52,8 +59,9 @@ public class Board : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.DownArrow)) MoveTo(Vector2Int.down);
     }
 
-    private void SpawnGamePieceNode(int count, NodeData nodeDataValue)
+    private Sequence SpawnGamePieceNode(int count, NodeData nodeDataValue)
     {
+        Sequence seq = DOTween.Sequence();
         var availableTiles = GetRandomAvailableTiles(count);
 
         foreach (TileNode availableTile in availableTiles)
@@ -63,15 +71,26 @@ public class Board : MonoBehaviour
             spawnedNode.Initialize(availableTile.X, availableTile.Y);
             _allPieces[availableTile.X, availableTile.Y] = spawnedNode;
             spawnedNode.SetGamePieceNode(nodeDataValue);
+
+            // Scale up
+            seq.Join(spawnedNode.ScaleUp());
         }
+
+        return seq;
+    }
+
+    public Sequence SpawnAfterBoardTurn()
+    {
+        return SpawnGamePieceNode(1, nodeDataContainer.GetNodeDataByValue(2));
     }
 
     public bool IsWithinBounds(int x, int y) => (x >= 0 && x < width && y >= 0 && y < height);
 
-    private void MoveTo(Vector2Int direction)
+    public void MoveTo(Vector2Int direction)
     {
         List<GamePieceNode> nodes = new List<GamePieceNode>();
-        Sequence seq = DOTween.Sequence();
+        Tween t = null;
+        int moveCount = 0;
 
         foreach (GamePieceNode piece in _allPieces)
         {
@@ -107,6 +126,7 @@ public class Board : MonoBehaviour
                         nextY = possibleNextY;
                         _allPieces[nextX, nextY] = node;
                         node.SetCoords(nextX, nextY);
+                        moveCount++;
 
                         // Next tile is null. Just move there.
                     }
@@ -121,9 +141,11 @@ public class Board : MonoBehaviour
                             nextY = possibleNextY;
                             _allPieces[nextX, nextY] = node;
                             node.SetCoords(nextX, nextY);
-                            nodes.Remove(possibleNextPiece);
+
+                            possibleNextPiece.transform.DOKill();
                             Destroy(possibleNextPiece.gameObject);
                             node.SetGamePieceNode(nodeDataContainer.GetNodeDataByValue(node.Value * 2));
+                            moveCount++;
                         }
                         else
                         {
@@ -140,12 +162,16 @@ public class Board : MonoBehaviour
                 }
             }
 
-            seq.Join(node.Move(new Vector2(nextX, nextY)));
-            
+            t = node.Move(new Vector2(nextX, nextY));
+
             // Clear its own grid
         }
-
-        seq.OnComplete(() => SpawnGamePieceNode(1, nodeDataContainer.GetNodeDataByValue(2)));
+        
+        
+        if (moveCount > 0)
+        {
+            OnBoardMoveCompleted?.Invoke();
+        }
     }
 
 

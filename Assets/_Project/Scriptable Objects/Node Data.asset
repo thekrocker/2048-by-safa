@@ -34,8 +34,8 @@ MonoBehaviour:
   - backgroundColor: {r: 0.9294118, g: 0.8078432, b: 0.4431373, a: 1}
     textColor: {r: 0.9803922, g: 0.9686275, b: 0.96470594, a: 1}
     value: 128
-  - backgroundColor: {r: 1, g: 1, b: 1, a: 1}
-    textColor: {r: 0, g: 0, b: 0, a: 0}
+  - backgroundColor: {r: 0.9294118, g: 0.8000001, b: 0.3803922, a: 1}
+    textColor: {r: 0.9803922, g: 0.96470594, b: 0.9490197, a: 1}
     value: 256
   - backgroundColor: {r: 0.92549026, g: 0.7843138, b: 0.3137255, a: 1}
     textColor: {r: 0.97647065, g: 0.9686275, b: 0.95294124, a: 1}

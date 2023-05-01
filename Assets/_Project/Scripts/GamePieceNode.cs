@@ -26,6 +26,13 @@ namespace _Project.Scripts
             valueText.text = Value.ToString();
         }
 
+        public Tween ScaleUp()
+        {
+            var initialScale = transform.localScale;
+            transform.localScale = Vector3.zero;
+            return transform.DOScale(initialScale, .3f);
+        }
+
         public override void SetCoords(int x, int y)
         {
             base.SetCoords(x, y);
