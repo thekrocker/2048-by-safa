@@ -53,10 +53,12 @@ public class Board : MonoBehaviour
 
     public void TryGetMoveInput()
     {
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) MoveTo(Vector2Int.left);
-        if (Input.GetKeyDown(KeyCode.RightArrow)) MoveTo(Vector2Int.right);
-        if (Input.GetKeyDown(KeyCode.UpArrow)) MoveTo(Vector2Int.up);
-        if (Input.GetKeyDown(KeyCode.DownArrow)) MoveTo(Vector2Int.down);
+        SwipeManager swipeManager = SwipeManager.Instance;
+        
+        if (swipeManager.SwipeLeft) MoveTo(Vector2Int.left);
+        if (swipeManager.SwipeRight) MoveTo(Vector2Int.right);
+        if (swipeManager.SwipeUp)  MoveTo(Vector2Int.up);
+        if (swipeManager.SwipeDown) MoveTo(Vector2Int.down);
     }
 
     private Sequence SpawnGamePieceNode(int count, NodeData nodeDataValue)
@@ -89,7 +91,6 @@ public class Board : MonoBehaviour
     public void MoveTo(Vector2Int direction)
     {
         List<GamePieceNode> nodes = new List<GamePieceNode>();
-        Tween t = null;
         int moveCount = 0;
 
         foreach (GamePieceNode piece in _allPieces)
@@ -162,11 +163,10 @@ public class Board : MonoBehaviour
                 }
             }
 
-            t = node.Move(new Vector2(nextX, nextY));
+            node.Move(new Vector2(nextX, nextY));
 
             // Clear its own grid
         }
-        
         
         if (moveCount > 0)
         {

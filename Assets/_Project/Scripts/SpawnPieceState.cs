@@ -10,10 +10,7 @@ namespace _Project.Scripts
 
         public override void Enter()
         {
-            Machine.Board.SpawnAfterBoardTurn().OnComplete(() =>
-            {
-                Machine.ChangeState(Machine.WaitingInputState);
-            });
+            Machine.Board.SpawnAfterBoardTurn().OnComplete(() => Machine.ChangeState(Machine.WaitingInputState));
         }
 
         public override void Update()

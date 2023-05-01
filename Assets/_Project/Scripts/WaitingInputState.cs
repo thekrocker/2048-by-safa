@@ -8,10 +8,11 @@
 
         public override void Enter()
         {
-            Machine.Board.OnBoardMoveCompleted += ChangeSpawnState;
+            SwipeManager.Instance.EnableSwipe(true);
+            Machine.Board.OnBoardMoveCompleted += ChangeSpawnPieceState;
         }
 
-        private void ChangeSpawnState()
+        private void ChangeSpawnPieceState()
         {
             Machine.ChangeState(Machine.SpawnPieceState);
         }
@@ -23,7 +24,8 @@
 
         public override void Exit()
         {
-            Machine.Board.OnBoardMoveCompleted -= ChangeSpawnState;
+            SwipeManager.Instance.EnableSwipe(false);
+            Machine.Board.OnBoardMoveCompleted -= ChangeSpawnPieceState;
         }
     }
 }
