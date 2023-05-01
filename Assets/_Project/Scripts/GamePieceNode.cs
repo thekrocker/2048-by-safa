@@ -10,10 +10,7 @@ namespace _Project.Scripts
         [SerializeField] private TMP_Text valueText;
         
         public int Value { get; private set; }
-
-        public TileNode TileNode { get; private set; }
         
-        public GamePieceNode MatchableNode { get; set; }
         
         public override void Initialize(int x, int y)
         {
@@ -29,14 +26,12 @@ namespace _Project.Scripts
             valueText.text = Value.ToString();
         }
 
-        public void SetTileNode(TileNode node)
+        public override void SetCoords(int x, int y)
         {
-            // Clear our tile's assigned piece..
-            // Then set our next tile node.
-            if (TileNode != null) TileNode.PieceNode = null;
-            TileNode = node;
-            TileNode.PieceNode = this;
+            base.SetCoords(x, y);
+            gameObject.name = $"Piece ({x},{y})";
         }
+
 
         public Tween Move(Vector2 position, float travelTime = .1f)
         {
@@ -45,13 +40,7 @@ namespace _Project.Scripts
 
         public bool AvailableForMatch(int value)
         {
-            return Value == value && MatchableNode != null;
-        }
-
-        public void Match(GamePieceNode nodeToMatch)
-        {
-            MatchableNode = nodeToMatch;
-            TileNode.PieceNode = null;
+            return Value == value;
         }
     }
 }

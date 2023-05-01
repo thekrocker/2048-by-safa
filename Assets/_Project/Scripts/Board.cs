@@ -7,6 +7,7 @@ using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using Sequence = DG.Tweening.Sequence;
 
 public class Board : MonoBehaviour
 {
@@ -45,10 +46,10 @@ public class Board : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) MoveTo(Vector2.left);
-        if (Input.GetKeyDown(KeyCode.RightArrow)) MoveTo(Vector2.right);
-        if (Input.GetKeyDown(KeyCode.UpArrow)) MoveTo(Vector2.up);
-        if (Input.GetKeyDown(KeyCode.DownArrow)) MoveTo(Vector2.down);
+        if (Input.GetKeyDown(KeyCode.LeftArrow)) MoveTo(Vector2Int.left);
+        if (Input.GetKeyDown(KeyCode.RightArrow)) MoveTo(Vector2Int.right);
+        if (Input.GetKeyDown(KeyCode.UpArrow)) MoveTo(Vector2Int.up);
+        if (Input.GetKeyDown(KeyCode.DownArrow)) MoveTo(Vector2Int.down);
     }
 
     private void SpawnGamePieceNode(int count, NodeData nodeDataValue)
@@ -62,16 +63,16 @@ public class Board : MonoBehaviour
             spawnedNode.Initialize(availableTile.X, availableTile.Y);
             _allPieces[availableTile.X, availableTile.Y] = spawnedNode;
             spawnedNode.SetGamePieceNode(nodeDataValue);
-            spawnedNode.SetTileNode(availableTile);
         }
     }
 
     public bool IsWithinBounds(int x, int y) => (x >= 0 && x < width && y >= 0 && y < height);
 
-    private void MoveTo(Vector2 direction)
+    private void MoveTo(Vector2Int direction)
     {
         List<GamePieceNode> nodes = new List<GamePieceNode>();
-        
+        Sequence seq = DOTween.Sequence();
+
         foreach (GamePieceNode piece in _allPieces)
         {
             if (piece == null) continue;
@@ -79,34 +80,72 @@ public class Board : MonoBehaviour
         }
 
         nodes = nodes.OrderBy(x => x.Position.x).ThenBy(x => x.Position.y).ToList();
-        
+
         if (direction == Vector2.right || direction == Vector2.up) nodes.Reverse();
 
-        foreach (GamePieceNode node in nodes)
+        for (int i = 0; i < nodes.Count; i++)
         {
-            int nextX = node.X + (int)direction.x;
-            int nextY = node.Y + (int)direction.y;
+            GamePieceNode node = nodes[i];
+            int nextX = node.X;
+            int nextY = node.Y;
 
-            if (!IsWithinBounds(nextX, nextY))
+            while (true)
             {
-                Debug.Log("Is not within bounds");
-                continue;
+                int possibleNextX = node.X + direction.x;
+                int possibleNextY = node.Y + direction.y;
+
+                if (IsWithinBounds(possibleNextX, possibleNextY))
+                {
+                    GamePieceNode possibleNextPiece = _allPieces[possibleNextX, possibleNextY];
+
+                    if (possibleNextPiece == null)
+                    {
+                        // Clean own grid & set next one & set coords.
+
+                        _allPieces[node.X, node.Y] = null;
+                        nextX = possibleNextX;
+                        nextY = possibleNextY;
+                        _allPieces[nextX, nextY] = node;
+                        node.SetCoords(nextX, nextY);
+
+                        // Next tile is null. Just move there.
+                    }
+                    else
+                    {
+                        // There is an object on the next tile.. Check for merging? 
+                        if (node.AvailableForMatch(possibleNextPiece.Value))
+                        {
+                            // Clean own grid & set next one & set coords.
+                            _allPieces[node.X, node.Y] = null;
+                            nextX = possibleNextX;
+                            nextY = possibleNextY;
+                            _allPieces[nextX, nextY] = node;
+                            node.SetCoords(nextX, nextY);
+                            nodes.Remove(possibleNextPiece);
+                            Destroy(possibleNextPiece.gameObject);
+                            node.SetGamePieceNode(nodeDataContainer.GetNodeDataByValue(node.Value * 2));
+                        }
+                        else
+                        {
+                            Debug.Log("Next piece is not matchable.. Stop there..");
+                        }
+
+                        break;
+                    }
+                }
+                else
+                {
+                    // Arrived at the end.. Break the loop.
+                    break;
+                }
             }
 
-            if (_allPieces[nextX, nextY] != null) continue;
-
-            _allPieces[node.X, node.Y] = null;
+            seq.Join(node.Move(new Vector2(nextX, nextY)));
             
-            TileNode nextTile = _allTiles[nextX, nextY];
-            
-            node.SetCoords(nextX, nextY);
-
-            _allPieces[nextX, nextY] = node;
-            
-            node.Move(nextTile.Position);
-
             // Clear its own grid
         }
+
+        seq.OnComplete(() => SpawnGamePieceNode(1, nodeDataContainer.GetNodeDataByValue(2)));
     }
 
 

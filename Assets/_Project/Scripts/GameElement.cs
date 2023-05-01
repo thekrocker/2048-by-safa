@@ -13,7 +13,7 @@ namespace _Project.Scripts
             SetCoords(x, y);
         }
 
-        public void SetCoords(int x, int y)
+        public virtual void SetCoords(int x, int y)
         {
             X = x;
             Y = y;

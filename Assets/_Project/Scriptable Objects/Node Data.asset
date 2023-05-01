@@ -19,8 +19,8 @@ MonoBehaviour:
   - backgroundColor: {r: 0.9333334, g: 0.8745099, b: 0.7843138, a: 1}
     textColor: {r: 0.4666667, g: 0.43137258, b: 0.39607847, a: 1}
     value: 4
-  - backgroundColor: {r: 1, g: 1, b: 1, a: 1}
-    textColor: {r: 0, g: 0, b: 0, a: 0}
+  - backgroundColor: {r: 0.93333334, g: 0.8745098, b: 0.78431374, a: 1}
+    textColor: {r: 0.46666667, g: 0.43137255, b: 0.39607844, a: 1}
     value: 8
   - backgroundColor: {r: 0.9607844, g: 0.58431375, b: 0.38823533, a: 1}
     textColor: {r: 0.9803922, g: 0.9843138, b: 0.98823535, a: 1}

@@ -264,7 +264,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1
+  m_text: 2048
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 71376bc0292ca124eae1cf434bc463ff, type: 2}
   m_sharedMaterial: {fileID: 7503798992041237932, guid: 71376bc0292ca124eae1cf434bc463ff, type: 2}
@@ -291,12 +291,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 8
+  m_fontSize: 3.85
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 8
-  m_fontSizeMax: 20
+  m_fontSizeMin: 2
+  m_fontSizeMax: 8
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
